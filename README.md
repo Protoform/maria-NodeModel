@@ -13,7 +13,7 @@ See http://peter.michaux.ca/downloads/maria-NodeModel/ for production ready buil
 Status
 ------
 
-Stable.
+Beta.
 
 
 Browser Support
@@ -25,7 +25,7 @@ Tested working in IE6 and newer browsers by a variety of manufacturers.
 Dependencies
 ------------
 
-None.
+Just [Maria](https://github.com/petermichaux/maria).
 
 
 Source Code

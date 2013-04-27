@@ -128,3 +128,7 @@ maria.NodeModel.prototype.handleEvent = function(evt) {
     }
 
 };
+
+maria.NodeModel.subclass = function() {
+    maria.Model.subclass.apply(this, arguments);
+};

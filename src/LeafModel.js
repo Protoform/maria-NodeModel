@@ -33,3 +33,7 @@ maria.LeafModel.prototype.destroy = function() {
     maria.Leaf.prototype.destroy.call(this);
     maria.Model.prototype.destroy.call(this);
 };
+
+maria.LeafModel.subclass = function() {
+    maria.Model.subclass.apply(this, arguments);
+};

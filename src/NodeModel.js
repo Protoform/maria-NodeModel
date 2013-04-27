@@ -53,6 +53,14 @@ maria.NodeModel.prototype.insertBefore = function(newChild, oldChild) {
     if ((before.parentNode !== newChild.parentNode) ||
         (before.nextSibling !== newChild.nextSibling) ||
         (before.previousSibling !== newChild.previousSibling)) {
+
+        if (typeof newChild.addEventListener === 'function') {
+            newChild.addEventListener('destroy', this);
+        }
+        if (typeof newChild.addParentEventTarget === 'function') {
+            newChild.addParentEventTarget(this);
+        }
+
         this.dispatchEvent({type: 'change'});    
     }
 };
@@ -64,7 +72,7 @@ maria.NodeModel.prototype.insertBefore = function(newChild, oldChild) {
 
 */
 maria.NodeModel.prototype.appendChild = function(newChild) {
-    this.insertBefore(newChild, null);
+    maria.Node.prototype.appendChild.call(this, newChild);
 };
 
 
@@ -74,19 +82,7 @@ maria.NodeModel.prototype.appendChild = function(newChild) {
 
 */
 maria.NodeModel.prototype.replaceChild = function(newChild, oldChild) {
-    var before = {
-        parentNode: newChild.parentNode,
-        nextSibling: newChild.nextSibling,
-        previousSibling: newChild.previousSibling
-    };
-
     maria.Node.prototype.replaceChild.call(this, newChild, oldChild);
-
-    if ((before.parentNode !== newChild.parentNode) ||
-        (before.nextSibling !== newChild.nextSibling) ||
-        (before.previousSibling !== newChild.previousSibling)) {
-        this.dispatchEvent({type: 'change'});    
-    }
 };
 
 
@@ -96,17 +92,39 @@ maria.NodeModel.prototype.replaceChild = function(newChild, oldChild) {
 
 */
 maria.NodeModel.prototype.removeChild = function(oldChild) {
-    var before = {
-        parentNode: oldChild.parentNode,
-        nextSibling: oldChild.nextSibling,
-        previousSibling: oldChild.previousSibling
-    };
+    if (oldChild.parentNode !== this) {
+        throw new Error('maria.NodeModel.prototype.removeChild: oldChild is not a child of this NodeModel.');
+    }
 
     maria.Node.prototype.removeChild.call(this, oldChild);
 
-    if ((before.parentNode !== oldChild.parentNode) ||
-        (before.nextSibling !== oldChild.nextSibling) ||
-        (before.previousSibling !== oldChild.previousSibling)) {
-        this.dispatchEvent({type: 'change'});    
+    if (typeof oldChild.removeEventListener === 'function') {
+        oldChild.removeEventListener('destroy', this);
     }
+    if (typeof oldChild.removeParentEventTarget === 'function') {
+        oldChild.removeParentEventTarget(this);
+    }
+
+    this.dispatchEvent({type: 'change'});    
+};
+
+/**
+
+If a child fires a `destroy` event then that child
+must be removed from this node. This handler will do the delete.
+
+@param {Object} event The event object.
+
+*/
+maria.NodeModel.prototype.handleEvent = function(evt) {
+
+    // If it is a destroy event being dispatched on the
+    // destroyed element then we want to remove it from
+    // this set.
+    if ((evt.type === 'destroy') &&
+        (evt.currentTarget === evt.target) &&
+        this.hasChild(evt.target)) { // could be bubbling from deeper in tree
+        this['removeChild'](evt.target);
+    }
+
 };

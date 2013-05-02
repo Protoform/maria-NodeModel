@@ -131,6 +131,57 @@
             assert.same(2, called);
         },
 
+        "test events bubble up the tree to grandparent": function() {
+            var parent = new maria.NodeModel();
+            var child = new maria.NodeModel();
+            var grandchild = new maria.LeafModel();
+            parent.appendChild(child);
+            child.appendChild(grandchild);
+            
+            var called = false;
+            
+            parent.addEventListener('alpha', function() {
+                called = true;
+            });
+            
+            grandchild.dispatchEvent({type: 'alpha'});
+            
+            assert.same(true, called);
+        },
+
+        "test parent starts being bubble parent after child is appended": function() {
+            var parent = new maria.NodeModel();
+            var child = new maria.NodeModel();
+            parent.appendChild(child);
+            
+            var called = false;
+            
+            parent.addEventListener('alpha', function() {
+                called = true;
+            });
+            
+            child.dispatchEvent({type: 'alpha'});
+            
+            assert.same(true, called);
+        },
+
+        "test parent stops being bubble parent after child is removed": function() {
+            var parent = new maria.NodeModel();
+            var child = new maria.NodeModel();
+            parent.appendChild(child);
+            
+            var called = false;
+            
+            parent.addEventListener('alpha', function() {
+                called = true;
+            });
+            
+            parent.removeChild(child);
+            child.dispatchEvent({type: 'alpha'});
+            
+            assert.same(false, called);
+        },
+
         "test insertBefore dispatches an event": function() {
             var nodeModel = new maria.NodeModel();
             var leafModel0 = new maria.LeafModel();

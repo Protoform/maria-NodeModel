@@ -11,9 +11,9 @@ methods to manage the children.
 
 @constructor
 
-@extends maria.Node
-
 @extends maria.Model
+
+@extends maria.Node
 
 */
 maria.NodeModel = function() {

@@ -24,6 +24,14 @@ maria.NodeModel = function() {
 maria.NodeModel.prototype = maria.create(maria.Model.prototype);
 maria.NodeModel.prototype.constructor = maria.NodeModel;
 
+/**
+
+@override
+
+*/
+maria.NodeModel.prototype.hasChildNodes = function() {
+    maria.Node.prototype.hasChildNodes.call(this);
+};
 
 /**
 
@@ -31,8 +39,12 @@ maria.NodeModel.prototype.constructor = maria.NodeModel;
 
 */
 maria.NodeModel.prototype.destroy = function() {
-    maria.Node.prototype.destroy.call(this);
+    // must call model destroy method first so containing
+    // node can remove the child before the child
+    // null's its parentNode reference which happens
+    // in the leaf destroy method.
     maria.Model.prototype.destroy.call(this);
+    maria.Node.prototype.destroy.call(this);
 };
 
 
@@ -122,8 +134,7 @@ maria.NodeModel.prototype.handleEvent = function(evt) {
     // destroyed element then we want to remove it from
     // this set.
     if ((evt.type === 'destroy') &&
-        (evt.currentTarget === evt.target) &&
-        this.hasChild(evt.target)) { // could be bubbling from deeper in tree
+        (evt.currentTarget === evt.target)) {
         this['removeChild'](evt.target);
     }
 

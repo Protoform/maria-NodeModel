@@ -30,8 +30,12 @@ maria.LeafModel.prototype.constructor = maria.LeafModel;
 
 */
 maria.LeafModel.prototype.destroy = function() {
-    maria.Leaf.prototype.destroy.call(this);
+    // must call model destroy method first so containing
+    // node can remove the child before the child
+    // null's its parentNode reference which happens
+    // in the leaf destroy method.
     maria.Model.prototype.destroy.call(this);
+    maria.Leaf.prototype.destroy.call(this);
 };
 
 maria.LeafModel.subclass = function() {

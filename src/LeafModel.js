@@ -7,7 +7,7 @@ of the composite design pattern in the model layer of your application.
 
 To attach a `LeafModel` to a `NodeModel`, use the `NodeModel`'s child
 manipulation methods: `appendChild`, `insertBefore`, `replaceChild`.
-To remove a `LeafModel` from a `NodeModel` use the `Node`'s `removeChild` method.
+To remove a `LeafModel` from a `NodeModel` use the `NodeModel`'s `removeChild` method.
 
 @constructor
 

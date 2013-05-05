@@ -187,13 +187,23 @@
             var leafModel0 = new maria.LeafModel();
             var leafModel1 = new maria.LeafModel();
             nodeModel.appendChild(leafModel1);
-            var happened = false;
-            maria.on(nodeModel, 'change', function() {
-                happened = true;
+            var events= [];
+            maria.on(nodeModel, 'change', function(evt) {
+                events.push(evt);
             });
             nodeModel.insertBefore(leafModel0, leafModel1);
-            assert.same(true, happened);
-        },
+            assert.same(1, events.length);
+            var event = events[0];
+            assert.isObject(event);
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(0, event.removedNodes.length);
+            assert.isArray(event.addedNodes);
+            assert.same(1, event.addedNodes.length);
+            assert.same(leafModel0, event.addedNodes[0]);
+            assert.same(null, event.previousSibling);
+            assert.same(leafModel1, event.nextSibling);
+        },  
 
         "test insertBefore sets parentNode": function() {
             var nodeModel = new maria.NodeModel();
@@ -208,12 +218,32 @@
             var leafModel1 = new maria.LeafModel();
             nodeModel.appendChild(leafModel0);
             nodeModel.appendChild(leafModel1);
-            var happened = false;
-            maria.on(nodeModel, 'change', function() {
-                happened = true;
+            var events = [];
+            maria.on(nodeModel, 'change', function(evt) {
+                events.push(evt);
             });
             nodeModel.insertBefore(leafModel1, leafModel0); // swaps the order of the two children
-            assert.same(true, happened);
+            assert.same(2, events.length);
+
+            var event = events[0];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(1, event.removedNodes.length);
+            assert.same(leafModel1, event.removedNodes[0]);
+            assert.isArray(event.addedNodes);
+            assert.same(0, event.addedNodes.length);
+            assert.same(leafModel0, event.previousSibling);
+            assert.same(null, event.nextSibling);
+
+            var event = events[1];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(0, event.removedNodes.length);
+            assert.isArray(event.addedNodes);
+            assert.same(1, event.addedNodes.length);
+            assert.same(leafModel1, event.addedNodes[0]);
+            assert.same(null, event.previousSibling);
+            assert.same(leafModel0, event.nextSibling);
         },
 
         "test insertBefore does not dispatch event when child was already last child": function() {
@@ -231,12 +261,21 @@
         "test appendChild dispatches an event": function() {
             var nodeModel = new maria.NodeModel();
             var leafModel = new maria.LeafModel();
-            var happened = false;
-            maria.on(nodeModel, 'change', function() {
-                happened = true;
+            var events = [];
+            maria.on(nodeModel, 'change', function(evt) {
+                events.push(evt);
             });
             nodeModel.appendChild(leafModel);
-            assert.same(true, happened);
+            assert.same(1, events.length);
+            var event = events[0];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(0, event.removedNodes.length);
+            assert.isArray(event.addedNodes);
+            assert.same(1, event.addedNodes.length);
+            assert.same(leafModel, event.addedNodes[0]);
+            assert.same(null, event.previousSibling);
+            assert.same(null, event.nextSibling);
         },
 
         "test appendChild dispatchs event when child moves": function() {
@@ -245,12 +284,34 @@
             var leafModel1 = new maria.LeafModel();
             nodeModel.appendChild(leafModel0);
             nodeModel.appendChild(leafModel1);
-            var happened = false;
-            maria.on(nodeModel, 'change', function() {
-                happened = true;
+            var events = [];
+            maria.on(nodeModel, 'change', function(evt) {
+                events.push(evt);
             });
             nodeModel.appendChild(leafModel0); // swaps the order of the two children
-            assert.same(true, happened);
+
+            assert.same(2, events.length);
+
+            var event = events[0];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(1, event.removedNodes.length);
+            assert.same(leafModel0, event.removedNodes[0]);
+            assert.isArray(event.addedNodes);
+            assert.same(0, event.addedNodes.length);
+            assert.same(null, event.previousSibling);
+            assert.same(leafModel1, event.nextSibling);
+            
+            var event = events[1];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(0, event.removedNodes.length);
+            assert.isArray(event.addedNodes);
+            assert.same(1, event.addedNodes.length);
+            assert.same(leafModel0, event.addedNodes[0]);
+            assert.same(leafModel1, leafModel0.previousSibling);
+            assert.same(leafModel1, event.previousSibling);
+            assert.same(null, event.nextSibling);
         },
 
         "test appendChild does not dispatch event when child was already last child": function() {
@@ -265,17 +326,40 @@
             assert.same(false, happened);
         },
         
-        "test replaceChild dispatches an event": function() {
+        "=>test replaceChild dispatches an event": function() {
             var nodeModel = new maria.NodeModel();
             var leafModel0 = new maria.LeafModel();
             var leafModel1 = new maria.LeafModel();
             nodeModel.appendChild(leafModel0);
-            var happened = false;
-            maria.on(nodeModel, 'change', function() {
-                happened = true;
+            var events = [];
+            maria.on(nodeModel, 'change', function(evt) {
+                events.push(evt);
             });
+
             nodeModel.replaceChild(leafModel1, leafModel0);
-            assert.same(true, happened);
+
+            // it would be better to optimize so that there is
+            // only 1 event in this case.
+            assert.same(2, events.length);
+
+            var event = events[0];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(0, event.removedNodes.length);
+            assert.isArray(event.addedNodes);
+            assert.same(1, event.addedNodes.length);
+            assert.same(null, event.previousSibling);
+            assert.same(leafModel0, event.nextSibling);
+            
+            var event = events[1];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(1, event.removedNodes.length);
+            assert.same(leafModel0, event.removedNodes[0])
+            assert.isArray(event.addedNodes);
+            assert.same(0, event.addedNodes.length);
+            assert.same(leafModel1, event.previousSibling);
+            assert.same(null, event.nextSibling);
         },
 
         "test replaceChild dispatchs event when child moves": function() {
@@ -284,12 +368,26 @@
             var leafModel1 = new maria.LeafModel();
             nodeModel.appendChild(leafModel0);
             nodeModel.appendChild(leafModel1);
-            var happened = false;
-            maria.on(nodeModel, 'change', function() {
-                happened = true;
+            var events = [];
+            maria.on(nodeModel, 'change', function(evt) {
+                events.push(evt);
             });
             nodeModel.replaceChild(leafModel0, leafModel1); // effectively removes leafModel1
-            assert.same(true, happened);
+
+            // There is only one event for the removal of leafModel1 because
+            // leafModel0 is already in the correct location.
+
+            assert.same(1, events.length);
+
+            var event = events[0];
+            assert.same('change', event.type);
+            assert.isArray(event.removedNodes);
+            assert.same(1, event.removedNodes.length);
+            assert.same(leafModel1, event.removedNodes[0]);
+            assert.isArray(event.addedNodes);
+            assert.same(0, event.addedNodes.length);
+            assert.same(leafModel0, event.previousSibling);
+            assert.same(null, event.nextSibling);
         },
 
         "test replaceChild does not dispatch event when child replacing itself": function() {

@@ -73,7 +73,13 @@ maria.NodeModel.prototype.insertBefore = function(newChild, oldChild) {
             newChild.addParentEventTarget(this);
         }
 
-        this.dispatchEvent({type: 'change'});    
+        this.dispatchEvent({
+            type: 'change',
+            removedNodes: [],
+            addedNodes: [newChild],
+            previousSibling: newChild.previousSibling,
+            nextSibling: newChild.nextSibling
+        });    
     }
 };
 
@@ -108,6 +114,11 @@ maria.NodeModel.prototype.removeChild = function(oldChild) {
         throw new Error('maria.NodeModel.prototype.removeChild: oldChild is not a child of this NodeModel.');
     }
 
+    var before = {
+        previousSibling: oldChild.previousSibling,
+        nextSibling: oldChild.nextSibling
+    };
+
     maria.Node.prototype.removeChild.call(this, oldChild);
 
     if (typeof oldChild.removeEventListener === 'function') {
@@ -117,7 +128,13 @@ maria.NodeModel.prototype.removeChild = function(oldChild) {
         oldChild.removeParentEventTarget(this);
     }
 
-    this.dispatchEvent({type: 'change'});    
+    this.dispatchEvent({
+        type: 'change',
+        removedNodes: [oldChild],
+        addedNodes: [],
+        previousSibling: before.previousSibling,
+        nextSibling: before.nextSibling
+    });    
 };
 
 /**

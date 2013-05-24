@@ -30,7 +30,7 @@ maria.NodeModel.prototype.constructor = maria.NodeModel;
 
 */
 maria.NodeModel.prototype.hasChildNodes = function() {
-    maria.Node.prototype.hasChildNodes.call(this);
+    return maria.Node.prototype.hasChildNodes.call(this);
 };
 
 /**

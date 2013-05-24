@@ -24,6 +24,13 @@
             assert.isFunction(nodeModel.hasChildNodes);
         },
 
+        "test hasChildNodes": function() {
+            var nodeModel = new maria.NodeModel();
+            assert.same(false, nodeModel.hasChildNodes());
+            nodeModel.appendChild(new maria.NodeModel());
+            assert.same(true, nodeModel.hasChildNodes());
+        },
+
         "test destroy dispatches event": function() {
             var nodeModel = new maria.NodeModel();
             var called = false;
@@ -326,7 +333,7 @@
             assert.same(false, happened);
         },
         
-        "=>test replaceChild dispatches an event": function() {
+        "test replaceChild dispatches an event": function() {
             var nodeModel = new maria.NodeModel();
             var leafModel0 = new maria.LeafModel();
             var leafModel1 = new maria.LeafModel();

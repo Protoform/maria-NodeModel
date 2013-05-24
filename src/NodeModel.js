@@ -149,10 +149,10 @@ maria.NodeModel.prototype.handleEvent = function(evt) {
 
     // If it is a destroy event being dispatched on the
     // destroyed element then we want to remove it from
-    // this set.
+    // this node.
     if ((evt.type === 'destroy') &&
         (evt.currentTarget === evt.target)) {
-        this['removeChild'](evt.target);
+        this.removeChild(evt.target);
     }
 
 };

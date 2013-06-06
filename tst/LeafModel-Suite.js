@@ -2,6 +2,10 @@
 
     buster.testCase('leafSuite', {
 
+        "test LeafModel has superConstructor Model": function() {
+            assert.same(maria.Model, maria.LeafModel.superConstructor);
+        },
+
         "test leafModel has EventTarget interface": function() {
             var leafModel = new maria.LeafModel();
             assert.isFunction(leafModel.dispatchEvent);

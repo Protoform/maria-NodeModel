@@ -21,6 +21,13 @@ maria.NodeModel = function() {
     maria.Node.call(this);
 };
 
+/**
+
+@property maria.NodeModel.superConstructor
+
+*/
+maria.NodeModel.superConstructor = maria.Model;
+
 maria.NodeModel.prototype = maria.create(maria.Model.prototype);
 maria.NodeModel.prototype.constructor = maria.NodeModel;
 

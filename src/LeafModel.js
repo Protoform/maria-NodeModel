@@ -20,6 +20,14 @@ maria.LeafModel = function() {
     maria.Model.call(this);
     maria.Leaf.call(this);
 };
+
+/**
+
+@property maria.LeafModel.superConstructor
+
+*/
+maria.LeafModel.superConstructor = maria.Model;
+
 maria.LeafModel.prototype = maria.create(maria.Model.prototype);
 maria.LeafModel.prototype.constructor = maria.LeafModel;
 
